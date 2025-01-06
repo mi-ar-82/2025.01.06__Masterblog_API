@@ -92,5 +92,21 @@ def update_post(post_id):
     # Return updated post with status code 200 OK
     return jsonify(post), 200
 
+# Search Endpoint: Search posts by title or content
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    # Get query parameters
+    title_query = request.args.get('title', '').lower()
+    content_query = request.args.get('content', '').lower()
+
+    # Filter posts based on the queries
+    filtered_posts = [
+        post for post in POSTS
+        if (title_query in post['title'].lower() or content_query in post['content'].lower())
+    ]
+
+    # Return the filtered posts as JSON
+    return jsonify(filtered_posts)
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5002, debug=True)
