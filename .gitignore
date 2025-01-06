@@ -7,3 +7,6 @@ __pycache__/
 .guides/
 .codio
 .settings
+
+test/
+test_*

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -67,7 +67,6 @@ def delete_post(post_id):
         # Post not found
         return jsonify({"error": f"Post with id {post_id} not found."}), 404
 
-
 # Update Endpoint: Update a post by ID
 @app.route('/api/posts/<int:post_id>', methods = ['PUT'])
 def update_post(post_id):
@@ -108,27 +107,17 @@ def search_posts():
     # Return the filtered posts as JSON
     return jsonify(filtered_posts)
 
-
 # List Endpoint with Sorting
-@app.route('/api/posts', methods = ['GET'])
-def get_posts():
-    # Get query parameters for sorting
-    sort_field = request.args.get('sort')
+@app.route('/api/posts/sorted', methods=['GET'])
+def get_sorted_posts():
+    sort_field = request.args.get('sort', 'title')
     sort_direction = request.args.get('direction', 'asc')
-    
-    # Validate sort field and direction
-    if sort_field and sort_field not in ['title', 'content']:
-        return jsonify({"error": f"Invalid sort field: {sort_field}. Allowed fields are 'title' or 'content'."}), 400
-    
-    if sort_direction not in ['asc', 'desc']:
-        return jsonify({"error": f"Invalid sort direction: {sort_direction}. Allowed values are 'asc' or 'desc'."}), 400
-    
-    # Sort posts if parameters are provided
-    sorted_posts = POSTS
-    if sort_field:
-        reverse = (sort_direction == 'desc')
-        sorted_posts = sorted(POSTS, key = lambda x: x[sort_field].lower(), reverse = reverse)
-    
+
+    if sort_field not in ['title', 'content']:
+        return jsonify({"error": f"Invalid sort field: {sort_field}"}), 400
+
+    reverse = (sort_direction == 'desc')
+    sorted_posts = sorted(POSTS, key=lambda x: x[sort_field].lower(), reverse=reverse)
     return jsonify(sorted_posts)
 
 if __name__ == '__main__':
