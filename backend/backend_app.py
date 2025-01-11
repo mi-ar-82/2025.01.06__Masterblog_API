@@ -92,20 +92,24 @@ def update_post(post_id):
     return jsonify(post), 200
 
 # Search Endpoint: Search posts by title or content
-@app.route('/api/posts/search', methods=['GET'])
+@app.route('/api/posts/search', methods = ['GET'])
 def search_posts():
     # Get query parameters
-    title_query = request.args.get('title', '').lower()
-    content_query = request.args.get('content', '').lower()
-
+    title_query = request.args.get('title', '').strip().lower()
+    content_query = request.args.get('content', '').strip().lower()
+    
     # Filter posts based on the queries
-    filtered_posts = [
-        post for post in POSTS
-        if (title_query in post['title'].lower() or content_query in post['content'].lower())
-    ]
-
+    filtered_posts = POSTS
+    
+    if title_query:
+        filtered_posts = [post for post in filtered_posts if title_query in post['title'].lower()]
+    
+    if content_query:
+        filtered_posts = [post for post in filtered_posts if content_query in post['content'].lower()]
+    
     # Return the filtered posts as JSON
-    return jsonify(filtered_posts)
+    return jsonify(filtered_posts), 200
+
 
 # List Endpoint with Sorting
 @app.route('/api/posts/sorted', methods=['GET'])
@@ -121,4 +125,4 @@ def get_sorted_posts():
     return jsonify(sorted_posts)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True, )
